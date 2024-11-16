@@ -1,0 +1,201 @@
+#include<iostream>
+#include<GL/glut.h>
+#include<cmath>
+using namespace std;
+
+int dx, dy, x, y, x1, y1_new, x2, y2;
+float m, p;
+
+void pixel(int x, int y)
+{
+    glBegin(GL_POINTS);
+    glVertex2i(x, y);
+    glEnd();
+}
+
+void continuous(int x1, int y1, int x2, int y2)
+{
+    dx = x2-x1;
+    dy = y2-y1;
+    m = dy/(float)dx;
+
+    if(fabs(m) < 1)
+    {
+        x=x1;
+        y=y1;
+        p=2*dy - dx;
+        while(x<x2)
+        {
+            if(p<0)
+            {
+                x = x+1;
+                y = y;
+                p = p + 2*dy;
+            }else
+            {
+                x = x+1;
+                y = y+1;
+                p = p + 2*dy - 2*dx;
+            }
+            pixel(x,y);
+        }
+    }
+    else
+    {
+        x=x1;
+        y=y1;
+        p = 2*dx - dy;
+        while(y<y2)
+        {
+            if(p<0)
+            {
+                y = y+1;
+                x = x;
+                p = p + 2*dx;
+            }
+            else{
+                y = y+1;
+                x = x+1;
+                p = p + 2*dx - 2*dy;
+            }
+            pixel(x, y);
+        }
+    }
+}
+
+void dotted(int x1, int y1, int x2, int y2)
+{
+     dx = x2-x1;
+    dy = y2-y1;
+    m = dy/(float)dx;
+
+    int dot=2;
+    int gap=4;
+
+    if(fabs(m) < 1)
+    {
+        x=x1;
+        y=y1;
+        p = 2*dy - dx;
+        while(x<x2)
+        {
+            for(int i=0; i<dot; ++i)
+            {
+                pixel(x+i, y);
+            }
+            x = x+dot+gap;
+        }
+    }
+    else{
+        x=x1;
+        y=y1;
+        p = 2*dx - dy;
+        while(y<y2)
+        {
+            for(int i=0; i<dot; ++i)
+            {
+                pixel(x, y+1);
+            }
+            y = y+dot+gap;
+        }
+    }
+}
+
+
+void dashed(int x1, int y1, int x2, int y2)
+{
+     dx = x2-x1;
+    dy = y2-y1;
+    m = dy/(float)dx;
+
+    int dash=8;
+    int gap=4;
+
+    if(fabs(m) < 1)
+    {
+        x=x1;
+        y=y1;
+        p = 2*dy - dx;
+        while(x<x2)
+        {
+            for(int i=0; i<dash; ++i)
+            {
+                pixel(x+i, y);
+            }
+            x = x+dash+gap;
+        }
+    }
+    else{
+        x=x1;
+        y=y1;
+        p = 2*dx - dy;
+        while(y<y2)
+        {
+            for(int i=0; i<dash; ++i)
+            {
+                pixel(x, y+1);
+            }
+            y = y+dash+gap;
+        }
+    }
+}
+
+void init()
+{
+    glClearColor(0.7, 0.7, 0.7, 0.7);
+    gluOrtho2D(-100, 100, -100, 100);
+}
+
+void display(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glPointSize(2.0f);
+    glColor3f(1.0, 0.1, 0.0);
+
+    int linetype;
+    cout<<"enter your choice(0=continue \n 1=dotted \n 2=dashed \n";
+    cin>>linetype;
+
+    switch(linetype)
+    {
+    case 0:
+        continuous(x1, y1_new, x2, y2);
+        break;
+    case 1:
+        dotted(x1, y1_new, x2, y2);
+        break;
+    case 2:
+        dashed(x1, y1_new, x2, y2);
+        break;
+    default:
+        cout<<"invalid";
+        break;
+    }
+    glFlush();
+}
+
+int main(int argc, char *argv[])
+ {
+    cout << "\n : Enter X1,Y1,X2,Y2 :\n";
+    cout << "x1: ";
+    cin >> x1;
+    cout << "Y1: ";
+    cin >> y1_new;
+    cout << "X2: ";
+    cin >> x2;
+    cout << "Y2: ";
+    cin >> y2;
+
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+    glutInitWindowSize(500, 500);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow("Bresenham's Line Algorithm");
+    init();
+    glutDisplayFunc(display);
+    glutMainLoop();
+    return 0;
+}
+
+
+
